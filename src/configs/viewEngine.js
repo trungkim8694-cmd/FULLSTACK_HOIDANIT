@@ -8,7 +8,7 @@ import express from "express";
 const configViewEngine = (app) => {
   app.use(express.static("./src/public"));
   app.set("view engine", "ejs"); // định nghĩa công cụ view
-  app.set("view", "./src/views"); // file path view Engine
+  app.set("views", "./src/views"); // file path view Engine
 };
 
 export default configViewEngine;
