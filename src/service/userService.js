@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import mysql from "mysql2/promise";
 import bluebird from "bluebird";
+import db from "../models/index";
 
 const salt = bcrypt.genSaltSync(10);
 
@@ -11,24 +12,19 @@ const hashUserPassword = (userPassword) => {
 
 const createNewUser = async (email, password, username) => {
   let hashPass = hashUserPassword(password);
-  const connection = await mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    database: "jwt",
-    Promise: bluebird,
-  });
   try {
-    const [rows, fields] = await connection.execute(
-      `INSERT INTO users (email, password, username) VALUES (?, ?, ?)`,
-      [email, hashPass, username]
-    );
+    await db.User.create({
+      username: username,
+      email: email,
+      password: hashPass,
+    });
   } catch (error) {
     console.log("check error: ", error);
   }
 };
 
 const getUserList = async () => {
-  let users = [];
+  let user = [];
   const connection = await mysql.createConnection({
     host: "localhost",
     user: "root",
@@ -37,7 +33,7 @@ const getUserList = async () => {
   });
 
   try {
-    const [rows, fields] = await connection.execute("SELECT * FROM users");
+    const [rows, fields] = await connection.execute("SELECT * FROM user");
     return rows;
   } catch (error) {
     console.log("check error: ", error);
@@ -54,7 +50,7 @@ const deleteUser = async (id) => {
 
   try {
     const [rows, fields] = await connection.execute(
-      "DELETE FROM users WHERE id = ?",
+      "DELETE FROM user WHERE id = ?",
       [id]
     );
     return rows;
@@ -72,7 +68,7 @@ const getUserById = async (id) => {
 
   try {
     const [rows, fields] = await connection.execute(
-      "SELECT * FROM users WHERE id = ?",
+      "SELECT * FROM user WHERE id = ?",
       [id]
     );
     return rows;
@@ -91,7 +87,7 @@ const updateUserInfo = async (email, username, id) => {
 
   try {
     const [rows, fields] = await connection.execute(
-      "UPDATE users set email = ?, username = ? WHERE id = ?",
+      "UPDATE user set email = ?, username = ? WHERE id = ?",
       [email, username, id]
     );
     return rows;
